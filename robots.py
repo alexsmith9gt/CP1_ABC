@@ -5,7 +5,7 @@ class Robot:
         self.positions = np.array([initial_position])
         self.goal = goal_position
 
-    def can_coexist(self, other: Robot):
+    def can_coexist(self, other):
         pass
 
     def get_desired_moves(self):
