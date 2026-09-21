@@ -5,12 +5,25 @@ class Robot:
         self.positions = np.array([initial_position])
         self.goal = goal_position
 
-    def can_coexist(self, other: Robot):
+    def can_coexist(self, other):
         pass
 
-    def get_desired_moves(self):
-        pass
+    def get_desired_new_position(self):
+        delta = self.goal - self.positions[-1]
+        moves = []
+        if delta[0] != 0:
+            moves = moves + np.array([np.sign(delta[0]), 0])
+        elif delta[1] != 0:
+            moves = moves + np.array([0, np.sign(delta[1])])
 
+        new_positions = moves
+        for i in range(len(new_positions)):
+            new_positions[i] = new_positions[i] + self.positions[-1]
+
+        return new_positions
+    
+    def move_to(self, position):
+        self.positions = np.append(self.positions, position, 0)
 
 class Drone(Robot):
     def __init__(self, initial_position, goal_position):
