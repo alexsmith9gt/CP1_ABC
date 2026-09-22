@@ -1,15 +1,18 @@
 from robots import *
+import matplotlib.pyplot as plt
+from matplotlib.ticker import (MultipleLocator, AutoMinorLocator)
 import numpy as np
 
 class Grid:
     def __init__(self, size:int=5):
         self.max_eval_step = 0
         self.current_step = 0
-
         # Initialze robots
         self.robots: list[Robot] = []
-
+        self.n = size
         self.num_robots = 2*size
+
+        # Initialization
         robot_types = np.random.choice([Drone, Humanoid, DiffDrive], self.num_robots)
         for i in range(self.num_robots):
             goal_pos = np.random.random_integers(0, size-1, (2,))
@@ -29,10 +32,50 @@ class Grid:
            
 
     def visualize(self):
-        pass
+
+        # Creating the initial grid plot
+        fig, ax = plt.subplots()
+
+        # framing the grid
+        ax.set_xlim(-0.5,(self.n  +0.5))
+        ax.set_ylim(-0.5,(self.n + 0.5))
+
+        # collecting and plotting data for each robot type
+        for robot in self.robots:
+            robo_pos = robot.positions[self.current_step]
+            goal_pos = robot.goal
+
+            if type(robot) == Drone:
+                color = 'red'
+                shape = 's'
+            elif type(robot) == Humanoid:
+                color = 'blue'
+                shape = 'o'
+            elif type(robot) == DiffDrive:
+                color = 'green'
+                shape = '^'
+
+            # scatter plotting robots and goals
+            ax.scatter(robo_pos[0], robo_pos[1], c = color, marker = shape)
+            ax.scatter(goal_pos[0], goal_pos[1], c = color, marker = "d")
+            # for i in range(len(robo_type)):
+            #     ax.plot([robo_pos[i][0],goal_pos[i][0]], #x values for robot and goal
+            #             [robo_pos[i][1],goal_pos[i][1]], #y values for robot and goal
+            #              color = color, linestyle = '--' ) 
+            
+
+        # Tick Marks and grid lines
+        ax.xaxis.set_major_locator(MultipleLocator(1))
+        ax.xaxis.set_minor_locator(MultipleLocator(0.5))
+        ax.yaxis.set_major_locator(MultipleLocator(1))
+        ax.yaxis.set_minor_locator(MultipleLocator(0.5))
+        ax.grid(which="minor")
+        ax.set_title(f"Robot Grid Navigation - {self.n}x{self.n} - t = {self.current_step}")
+        plt.show()
 
     def step_forward(self):
         self.current_step += 1
+
         if self.current_step > self.max_eval_step:
             # Step the simulation, doing greedy movement with conflict resolution            
             conflict_resolution_positions = {}
@@ -72,7 +115,7 @@ class Grid:
                         max_dist_robot = item['robot_id']
 
                 if max_dist_robot != -1:
-                    robot.move_to(pos)
+                    self.robots[max_dist_robot].move_to(pos)
                     robots_to_move.remove(max_dist_robot)
 
             # If we were unable to move a robot, make it stay still and wait
@@ -83,3 +126,4 @@ class Grid:
     def step_backward(self):
         if self.current_step > 0:
             self.current_step -= 1
+                

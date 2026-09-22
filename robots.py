@@ -8,6 +8,12 @@ class Robot:
     def can_coexist(self, other):
         pass
 
+    def at_goal(self, current_step):
+        if np.all(self.positions[current_step] == self.goal):
+            return True
+        return False
+
+            
     def get_desired_new_position(self):
         delta = self.goal - self.positions[-1]
         moves = []
