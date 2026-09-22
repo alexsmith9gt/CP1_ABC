@@ -10,6 +10,13 @@ class Robot:
 
     def get_desired_moves(self):
         pass
+    def at_goal(self, current_step):
+        if (self.positions[current_step][0] == self.goal_position[0] and 
+            self.positions[current_step][1] == self.goal_position[1]):
+            return True
+        return False
+
+            
 
 
 class Drone(Robot):

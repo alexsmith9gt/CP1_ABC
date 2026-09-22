@@ -15,9 +15,27 @@ class Grid:
                 self.matrix[i].append(Cell(i,j))
         # Initialze robots
         self.robots: list[Robot] = []
+
+        # Positional data lists for graphing:
+        self.drones_x = []
+        self.drones_y = []
+        self.drones_goals_x = []
+        self.drones_goals_y =[]
+
+        self.humans_x = []
+        self.humans_y = []
+        self.humans_goals_x = []
+        self.humans_goals_y = []
+
+        self.drives_x = []
+        self.drives_y = []
+        self.drives_goals_x = []
+        self.drives_goals_y = []
         # TODO
 
     def visualize(self):
+        #collect positional data
+
         # Creating the initial grid plot
         fig, ax = plt.subplots()
 
@@ -49,6 +67,13 @@ class Grid:
     def add_robot(self, rob):
         if type(rob) == Robot:
             self.robots.append(rob)
+    def get_positional_data(self):
+        for robot in self.robots():
+            if robot.at_goal(self.current_step):
+                continue
+            else:
+                if type(robot) == Drone
+
     
 
 class Cell:
