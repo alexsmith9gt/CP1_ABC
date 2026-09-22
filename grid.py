@@ -12,17 +12,17 @@ class Grid:
         self.num_robots = 2*size
         robot_types = np.random.choice([Drone, Humanoid, DiffDrive], self.num_robots)
         for i in range(self.num_robots):
-            goal_pos = np.random.random_integers(0, size-1, (size,size))
-            init_pos = np.random.random_integers(0, size-1, (size,size))
+            goal_pos = np.random.random_integers(0, size-1, (2,))
+            init_pos = np.random.random_integers(0, size-1, (2,))
 
             # Make sure we initialize each robot in a valid location
             while True:
                 new_robot = robot_types[i](init_pos, goal_pos)
-                for j in len(self.robots):
-                    if self.robots[j].positions[0] == init_pos and not self.robots[j].can_coexist(new_robot):
-                        init_pos = np.random.random_integers(0, size-1, (size,size))
+                for j in range(len(self.robots)):
+                    if np.all(self.robots[j].positions[0] == init_pos) and not self.robots[j].can_coexist(new_robot):
+                        init_pos = np.random.random_integers(0, size-1, (2,))
                         continue
-                self.robots[i] = new_robot
+                self.robots.append(new_robot)
                 break
 
         
@@ -40,15 +40,15 @@ class Grid:
             for i in range(self.num_robots):
                 robot = self.robots[i]
                 # Nothing to do if already at the goal
-                if robot.positions[-1] == robot.goal:
-                    robot.positions = np.append(robot.positions, robot.goal, 0)
+                if np.all(robot.positions[-1] == robot.goal):
+                    robot.positions = np.append(robot.positions, [robot.goal], 0)
                     robot.move_to(robot.goal)
                     robots_to_move.remove(i)
                 else:
                     new_pos = robot.get_desired_new_position()
 
                     # Robots are always allowed to move to their goal state
-                    if new_pos[0] == robot.goal:
+                    if np.all(new_pos[0] == robot.goal):
                         robot.move_to(robot.goal)
                         robots_to_move.remove(i)
                     else:
@@ -56,10 +56,10 @@ class Grid:
                         dist = np.sum(np.abs(displacement))
                         for pos in new_pos:
                             d = {'robot_id': i, 'dist_to_goal': dist}
-                            if pos in conflict_resolution_positions:
-                                conflict_resolution_positions[pos] += [d]
+                            if tuple(pos) in conflict_resolution_positions:
+                                conflict_resolution_positions[tuple(pos)] += [d]
                             else:
-                                conflict_resolution_positions[pos] = [d]
+                                conflict_resolution_positions[tuple(pos)] = [d]
 
             # Iterate over proposed movement locations and select the robot
             # with greatest distance to the goal
