@@ -9,8 +9,7 @@ class Robot:
         pass
 
     def at_goal(self, current_step):
-        if (self.positions[current_step][0] == self.goal_position[0] and 
-            self.positions[current_step][1] == self.goal_position[1]):
+        if (self.positions[current_step][0] - self.goal_position) == [0,0]:
             return True
         return False
 
