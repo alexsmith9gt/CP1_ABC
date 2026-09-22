@@ -7,32 +7,10 @@ class Grid:
     def __init__(self, size:int=5):
         self.max_eval_step = 0
         self.current_step = 0
-        self.n = size
-        # matrix representing the 2-D grid
-        self.matrix = []
-        # filling matrix with a Cell object in each index
-        for i in range(size):
-            self.matrix.append([])
-            for j in range(size):
-                self.matrix[i].append(Cell(i,j))
         # Initialze robots
         self.robots: list[Robot] = []
 
-        # Positional data lists for graphing:
-        self.drones_x = []
-        self.drones_y = []
-        self.drones_goals_x = []
-        self.drones_goals_y =[]
 
-        self.humans_x = []
-        self.humans_y = []
-        self.humans_goals_x = []
-        self.humans_goals_y = []
-
-        self.drives_x = []
-        self.drives_y = []
-        self.drives_goals_x = []
-        self.drives_goals_y = []
         self.num_robots = 2*size
         robot_types = np.random.choice([Drone, Humanoid, DiffDrive], self.num_robots)
         for i in range(self.num_robots):
@@ -44,10 +22,22 @@ class Grid:
                 new_robot = robot_types[i](init_pos, goal_pos)
                 for j in len(self.robots):
                     if self.robots[j].positions[0] == init_pos and not self.robots[j].can_coexist(new_robot):
+                        '''
+                        I don't believe this actually changes the starting position
+                        needs to be new_robot.initial_position = ...
+                        '''
                         init_pos = np.random.random_integers(0, size-1, (size,size))
                         continue
                 self.robots[i] = new_robot
                 break
+
+        # Positional data lists for graphing:
+        self.all_pos = []
+        self.all_goals = []
+        for robot in self.robots:
+            self.all_goals.append
+
+        
 
         
            
@@ -128,23 +118,18 @@ class Grid:
         if type(rob) == Robot:
             self.robots.append(rob)
     def get_positional_data(self):
+        clear_positional_data()
         for robot in self.robots():
             if robot.at_goal(self.current_step):
                 continue
             else:
-                if type(robot) == Drone
+                if type(robot) == Drone:
+                    self.drones_x.append(robot.positions[self.current_step][0])
+                    self.drones_y.append(robot.positions[self.current_step][1])
+                    
 
     
 
-class Cell:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-        #robots currently occupying the cell
-        self.occupants = []
-        #list of robots that have a goal in this cell
-        self.goals = []
-        #robots that are staged to move to this cell in the next timestep
-        self.staged_move = []
+
 g = Grid(5)
 g.visualize()
