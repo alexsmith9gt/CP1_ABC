@@ -9,10 +9,14 @@ class Grid:
         self.current_step = 0
         # Initialze robots
         self.robots: list[Robot] = []
-
+        #separating the robots by type
+        self.diff_drives: list[DiffDrive] = []
+        self.drones: list[Drone] = []
+        self.humanoids: list[Humanoid] = []
 
         self.num_robots = 2*size
         robot_types = np.random.choice([Drone, Humanoid, DiffDrive], self.num_robots)
+        # print(robot_types)
         for i in range(self.num_robots):
             goal_pos = np.random.random_integers(0, size-1, (size,size))
             init_pos = np.random.random_integers(0, size-1, (size,size))
@@ -29,6 +33,12 @@ class Grid:
                         init_pos = np.random.random_integers(0, size-1, (size,size))
                         continue
                 self.robots[i] = new_robot
+                if type(new_robot) == Drone:
+                    self.drones.append(new_robot)
+                elif type(new_robot) == Humanoid:
+                    self.humanoids.append(new_robot)
+                elif type(new_robot) == DiffDrive:
+                    self.diff_drives.append(new_robot)
                 break
 
         # Positional data lists for graphing:
@@ -43,7 +53,6 @@ class Grid:
            
 
     def visualize(self):
-        #collect positional data
 
         # Creating the initial grid plot
         fig, ax = plt.subplots()
@@ -51,6 +60,30 @@ class Grid:
         # framing the grid
         ax.set_xlim(-0.5,(self.n  +0.5))
         ax.set_ylim(-0.5,(self.n + 0.5))
+
+        # collecting and plotting data for each robot type
+        for robo_type in [self.drones, self.humanoids, self.diff_drives]:
+            robo_pos, goal_pos = self.get_positional_data(robo_type)
+
+            #setting marker colors and shapes
+            if type(robo_type[0]) == Drone:
+                color = 'red'
+                shape = 's'
+            elif type(robo_type[0]) == Humanoid:
+                color = 'blue'
+                shape = 'o'
+            elif type(robo_type[0]) == DiffDrive:
+                color = 'green'
+                shape = '^'
+
+            # scatter plotting robots and goals
+            ax.scatter(robo_pos[:,0], robo_pos[:,1], color = color, shape = shape)
+            ax.scatter(goal_pos[:,0], goal_pos[:,1], color = color, shape = "d")
+            for i in range(len(robo_type)):
+                ax.plot([robo_pos[i][0],goal_pos[i][0]], #x values for robot and goal
+                        [robo_pos[i][1],goal_pos[i][1]], #y values for robot and goal
+                         color = color, linestyle = '--' ) 
+            
 
         # Tick Marks and grid lines
         ax.xaxis.set_major_locator(MultipleLocator(1))
@@ -117,15 +150,26 @@ class Grid:
     def add_robot(self, rob):
         if type(rob) == Robot:
             self.robots.append(rob)
-    def get_positional_data(self):
-        clear_positional_data()
-        for robot in self.robots():
+    def get_positional_data(self, robo_type):
+        robo_pos = np.array([])
+        goal_pos = np.array([])
+        for robot in robo_type:
             if robot.at_goal(self.current_step):
                 continue
             else:
-                if type(robot) == Drone:
-                    self.drones_x.append(robot.positions[self.current_step][0])
-                    self.drones_y.append(robot.positions[self.current_step][1])
+                # adding random floats between -0.3 and 0.3 so goals and 
+                # robots don't cover each other in the grid
+                # multiply by .6 and subtracting 0.3 to put it in the correct
+                # range from [0,1) to [-0.3,0.3)
+                rng = np.random.default_rng()
+                x_rand = (rng.random()*.6) - 0.3
+                y_rand = (rng.random()*.6) - 0.3
+                np.append(robo_pos, (robot.positions[self.current_step] + 
+                                     np.array([x_rand, y_rand])))
+                np.append(goal_pos, (robot.goal + 
+                                     np.array([x_rand, y_rand])))
+        return(robo_pos, goal_pos)
+                
                     
 
     
