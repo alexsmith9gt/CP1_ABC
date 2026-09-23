@@ -24,9 +24,10 @@ class Grid:
                 for j in range(len(self.robots)):
                     if np.all(self.robots[j].positions[0] == init_pos) and not self.robots[j].can_coexist(new_robot):
                         init_pos = np.random.random_integers(0, size-1, (2,))
-                        continue
-                self.robots.append(new_robot)
-                break
+                        break
+                else:
+                    self.robots.append(new_robot)
+                    break
 
         
            
@@ -44,24 +45,40 @@ class Grid:
         for robot in self.robots:
             robo_pos = robot.positions[self.current_step]
             goal_pos = robot.goal
+            if (robo_pos == goal_pos).all():
+                continue
 
+            # adding random floats between -0.3 and 0.3 so goals and 
+                # robots don't cover each other in the grid
+                # multiply by .6 and subtracting 0.3 to put it in the correct
+                # range from [0,1) to [-0.3,0.3)
+            rng = np.random.default_rng()
+            x_rand = (rng.random()*.6) - 0.3
+            y_rand = (rng.random()*.6) - 0.3
+            rand_vals = np.array([x_rand,y_rand])
+            robo_pos = robo_pos.astype(float)
+            goal_pos = goal_pos.astype(float)
+            robo_pos += rand_vals
+            goal_pos += rand_vals
             if type(robot) == Drone:
                 color = 'red'
                 shape = 's'
+                label = "Drone"
             elif type(robot) == Humanoid:
                 color = 'blue'
                 shape = 'o'
+                label = "Humanoid"
             elif type(robot) == DiffDrive:
                 color = 'green'
                 shape = '^'
+                label = "Diff Drive"
 
             # scatter plotting robots and goals
-            ax.scatter(robo_pos[0], robo_pos[1], c = color, marker = shape)
-            ax.scatter(goal_pos[0], goal_pos[1], c = color, marker = "d")
-            # for i in range(len(robo_type)):
-            #     ax.plot([robo_pos[i][0],goal_pos[i][0]], #x values for robot and goal
-            #             [robo_pos[i][1],goal_pos[i][1]], #y values for robot and goal
-            #              color = color, linestyle = '--' ) 
+            ax.scatter(robo_pos[0], robo_pos[1], c = color, marker = shape, label = label)
+            ax.scatter(goal_pos[0], goal_pos[1], c = color, marker = "d", label = label + " Goal")
+            ax.plot([robo_pos[0],goal_pos[0]], #x values for robot and goal
+                    [robo_pos[1],goal_pos[1]], #y values for robot and goal
+                         color = color, linestyle = '--' ) 
             
 
         # Tick Marks and grid lines
@@ -70,6 +87,7 @@ class Grid:
         ax.yaxis.set_major_locator(MultipleLocator(1))
         ax.yaxis.set_minor_locator(MultipleLocator(0.5))
         ax.grid(which="minor")
+        ax.legend()
         ax.set_title(f"Robot Grid Navigation - {self.n}x{self.n} - t = {self.current_step}")
         plt.show()
 
