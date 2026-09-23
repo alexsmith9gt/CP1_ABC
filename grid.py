@@ -40,6 +40,7 @@ class Grid:
         # framing the grid
         ax.set_xlim(-0.5,(self.n  +0.5))
         ax.set_ylim(-0.5,(self.n + 0.5))
+        ax.axis('square')
 
         # collecting and plotting data for each robot type
         # drone_pos = np.array([[]])
@@ -107,6 +108,7 @@ class Grid:
         ax.grid(which="minor")
         ax.legend()
         ax.set_title(f"Robot Grid Navigation - {self.n}x{self.n} - t = {self.current_step}")
+
         plt.show()
 
     def step_forward(self):

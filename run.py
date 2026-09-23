@@ -3,8 +3,8 @@ import msvcrt
 import matplotlib.pyplot as plt
 
 def menu_options():
-    print("\'right arrow\': move forward by one timestep\n" \
-        "\'left arrow\': move backward by one timestep\n" \
+    print("*close plot* + \'right arrow\': move forward by one timestep\n" \
+        "*close plot* + \'left arrow\': move backward by one timestep\n" \
         "\'escape key\': terminate the program\n" \
         "\'h\': repeat this list")
 
