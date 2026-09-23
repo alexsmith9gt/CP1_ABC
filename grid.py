@@ -42,12 +42,12 @@ class Grid:
         ax.set_ylim(-0.5,(self.n + 0.5))
 
         # collecting and plotting data for each robot type
-        drone_pos = np.array([[]])
-        human_pos = np.array([[]])
-        diff_drive_pos = np.array([[]])
-        drone_goal_pos = np.array([[]])
-        human_goal_pos = np.array([[]])
-        diff_drive_goal_pos = np.array([[]])
+        # drone_pos = np.array([[]])
+        # human_pos = np.array([[]])
+        # diff_drive_pos = np.array([[]])
+        # drone_goal_pos = np.array([[]])
+        # human_goal_pos = np.array([[]])
+        # diff_drive_goal_pos = np.array([[]])
         for robot in self.robots:
             robo_pos = robot.positions[self.current_step]
             goal_pos = robot.goal
@@ -71,37 +71,35 @@ class Grid:
                 shape = 's'
                 label = "Drone"
                 print("adding drone")
-                np.append(drone_pos, [robo_pos], axis = 0)
-                np.append(drone_goal_pos, [goal_pos], axis = 0)
+                # np.append(drone_pos, [robo_pos], axis = 0)
+                # np.append(drone_goal_pos, [goal_pos], axis = 0)
             elif type(robot) == Humanoid:
                 color = 'blue'
                 shape = 'o'
                 label = "Humanoid"
-                np.append(human_pos, [robo_pos], axis = 0)
-                np.append(human_goal_pos, [goal_pos], axis = 0)
+                # np.append(human_pos, [robo_pos], axis = 0)
+                # np.append(human_goal_pos, [goal_pos], axis = 0)
             elif type(robot) == DiffDrive:
                 color = 'green'
                 shape = '^'
                 label = "Diff Drive"
-                np.append(diff_drive_pos, [robo_pos], axis = 0)
-                np.append(diff_drive_goal_pos, [goal_pos], axis = 0)
+                # np.append(diff_drive_pos, [robo_pos], axis = 0)
+                # np.append(diff_drive_goal_pos, [goal_pos], axis = 0)
 
             # scatter plotting robots and goals
-            # ax.scatter(robo_pos[0], robo_pos[1], c = color, marker = shape, label = label)
-            # ax.scatter(goal_pos[0], goal_pos[1], c = color, marker = "d", label = label + " Goal")
+            ax.scatter(robo_pos[0], robo_pos[1], c = color, marker = shape)
+            ax.scatter(goal_pos[0], goal_pos[1], c = color, marker = "d")
             ax.plot([robo_pos[0],goal_pos[0]], #x values for robot and goal
                     [robo_pos[1],goal_pos[1]], #y values for robot and goal
                          color = color, linestyle = '--' ) 
-        print(drone_pos)
-        # scatter plotting the robots and their goals   
-        ax.scatter(drone_pos[:,0], drone_pos[:,1], shape = 's', color = 'red', label = 'Drone')
-        ax.scatter(drone_goal_pos[:,0], drone_goal_pos[:,1], shape = 'd', color = 'red', label = 'Drone Goal')
+            
+        # Plotting empty scatterplots to create the legend
+        ax.scatter([],[], color = 'red', marker = 's', label = "Drone")
+        ax.scatter([],[], color = 'blue', marker = 'o', label = "Humanoid")
+        ax.scatter([],[], color = 'green', marker = '^', label = "Diff Drive")
+        ax.scatter([],[], color = 'black', marker = 'd', label = "Goal")
+        
 
-        ax.scatter(human_pos[:,0], human_pos[:,1], shape = 'o', color = 'blue', label = 'Humanoid')
-        ax.scatter(human_goal_pos[:,0], human_goal_pos[:,1], shape = 'd', color = 'blue', label = 'Humanoid Goal')
-
-        ax.scatter(diff_drive_pos[:,0], diff_drive_pos[:,1], shape = '^', color = 'green', label = 'Diff Drive')
-        ax.scatter(diff_drive_goal_pos[:,0], diff_drive_goal_pos[:,1], shape = 'd', color = 'green', label = 'Diff Drive Goal')
         # Tick Marks and grid lines
         ax.xaxis.set_major_locator(MultipleLocator(1))
         ax.xaxis.set_minor_locator(MultipleLocator(0.5))
