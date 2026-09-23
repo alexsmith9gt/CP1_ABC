@@ -70,7 +70,6 @@ class Grid:
                 color = 'red'
                 shape = 's'
                 label = "Drone"
-                print("adding drone")
                 # np.append(drone_pos, [robo_pos], axis = 0)
                 # np.append(drone_goal_pos, [goal_pos], axis = 0)
             elif type(robot) == Humanoid:
