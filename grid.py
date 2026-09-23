@@ -38,8 +38,8 @@ class Grid:
         fig, ax = plt.subplots()
 
         # framing the grid
-        ax.set_xlim(-0.5,(self.n  +0.5))
-        ax.set_ylim(-0.5,(self.n + 0.5))
+        ax.set_xlim(-0.5,(self.n - 0.5))
+        ax.set_ylim(-0.5,(self.n - 0.5))
         ax.axis('square')
 
         # collecting and plotting data for each robot type
