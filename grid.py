@@ -22,17 +22,29 @@ class Grid:
             while True:
                 new_robot = robot_types[i](init_pos, goal_pos)
                 for j in range(len(self.robots)):
-                    if np.all(self.robots[j].positions[0] == init_pos) and not self.robots[j].can_coexist(new_robot):
+                    if ((np.all(self.robots[j].positions[0] == init_pos) and not self.robots[j].can_coexist(new_robot))
+                        or np.all(init_pos == goal_pos)):
                         init_pos = np.random.random_integers(0, size-1, (2,))
                         break
-                else:
+                else: #only runs if for loop terminates naturally (not by break)
                     self.robots.append(new_robot)
                     break
 
-        
-           
+
+
+
 
     def visualize(self):
+        def on_key(event):
+            if event.key == 'left':
+                if self.current_step > 0:
+                    self.step_backward()
+                    plt.close()
+                    self.visualize()
+            if event.key == 'right':
+                self.step_forward()
+                plt.close()
+                self.visualize()
 
         # Creating the initial grid plot
         fig, ax = plt.subplots()
@@ -42,13 +54,6 @@ class Grid:
         ax.set_ylim(-0.5,(self.n - 0.5))
         ax.axis('square')
 
-        # collecting and plotting data for each robot type
-        # drone_pos = np.array([[]])
-        # human_pos = np.array([[]])
-        # diff_drive_pos = np.array([[]])
-        # drone_goal_pos = np.array([[]])
-        # human_goal_pos = np.array([[]])
-        # diff_drive_goal_pos = np.array([[]])
         for robot in self.robots:
             robo_pos = robot.positions[self.current_step]
             goal_pos = robot.goal
@@ -71,20 +76,14 @@ class Grid:
                 color = 'red'
                 shape = 's'
                 label = "Drone"
-                # np.append(drone_pos, [robo_pos], axis = 0)
-                # np.append(drone_goal_pos, [goal_pos], axis = 0)
             elif type(robot) == Humanoid:
                 color = 'blue'
                 shape = 'o'
                 label = "Humanoid"
-                # np.append(human_pos, [robo_pos], axis = 0)
-                # np.append(human_goal_pos, [goal_pos], axis = 0)
             elif type(robot) == DiffDrive:
                 color = 'green'
                 shape = '^'
                 label = "Diff Drive"
-                # np.append(diff_drive_pos, [robo_pos], axis = 0)
-                # np.append(diff_drive_goal_pos, [goal_pos], axis = 0)
 
             # scatter plotting robots and goals
             ax.scatter(robo_pos[0], robo_pos[1], c = color, marker = shape)
@@ -108,7 +107,7 @@ class Grid:
         ax.grid(which="minor")
         ax.legend()
         ax.set_title(f"Robot Grid Navigation - {self.n}x{self.n} - t = {self.current_step}")
-
+        plt.connect('key_press_event', on_key)
         plt.show()
 
     def step_forward(self):
