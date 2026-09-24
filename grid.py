@@ -22,17 +22,29 @@ class Grid:
             while True:
                 new_robot = robot_types[i](init_pos, goal_pos)
                 for j in range(len(self.robots)):
-                    if np.all(self.robots[j].positions[0] == init_pos) and not self.robots[j].can_coexist(new_robot):
+                    if ((np.all(self.robots[j].positions[0] == init_pos) and not self.robots[j].can_coexist(new_robot))
+                        or np.all(init_pos == goal_pos)):
                         init_pos = np.random.random_integers(0, size-1, (2,))
                         break
-                else:
+                else: #only runs if for loop terminates naturally (not by break)
                     self.robots.append(new_robot)
                     break
 
-        
-           
+
+
+
 
     def visualize(self):
+        def on_key(event):
+            if event.key == 'left':
+                if self.current_step > 0:
+                    self.step_backward()
+                    plt.close()
+                    self.visualize()
+            if event.key == 'right':
+                self.step_forward()
+                plt.close()
+                self.visualize()
 
         # Creating the initial grid plot
         fig, ax = plt.subplots()
@@ -108,7 +120,7 @@ class Grid:
         ax.grid(which="minor")
         ax.legend()
         ax.set_title(f"Robot Grid Navigation - {self.n}x{self.n} - t = {self.current_step}")
-
+        plt.connect('key_press_event', on_key)
         plt.show()
 
     def step_forward(self):
