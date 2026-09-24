@@ -54,13 +54,6 @@ class Grid:
         ax.set_ylim(-0.5,(self.n - 0.5))
         ax.axis('square')
 
-        # collecting and plotting data for each robot type
-        # drone_pos = np.array([[]])
-        # human_pos = np.array([[]])
-        # diff_drive_pos = np.array([[]])
-        # drone_goal_pos = np.array([[]])
-        # human_goal_pos = np.array([[]])
-        # diff_drive_goal_pos = np.array([[]])
         for robot in self.robots:
             robo_pos = robot.positions[self.current_step]
             goal_pos = robot.goal
@@ -83,20 +76,14 @@ class Grid:
                 color = 'red'
                 shape = 's'
                 label = "Drone"
-                # np.append(drone_pos, [robo_pos], axis = 0)
-                # np.append(drone_goal_pos, [goal_pos], axis = 0)
             elif type(robot) == Humanoid:
                 color = 'blue'
                 shape = 'o'
                 label = "Humanoid"
-                # np.append(human_pos, [robo_pos], axis = 0)
-                # np.append(human_goal_pos, [goal_pos], axis = 0)
             elif type(robot) == DiffDrive:
                 color = 'green'
                 shape = '^'
                 label = "Diff Drive"
-                # np.append(diff_drive_pos, [robo_pos], axis = 0)
-                # np.append(diff_drive_goal_pos, [goal_pos], axis = 0)
 
             # scatter plotting robots and goals
             ax.scatter(robo_pos[0], robo_pos[1], c = color, marker = shape)
