@@ -19,7 +19,7 @@ class Robot:
         moves = []
         if delta[0] != 0:
             moves.append(np.array([np.sign(delta[0]), 0]))
-        elif delta[1] != 0:
+        if delta[1] != 0:
             moves.append(np.array([0, np.sign(delta[1])]))
 
         new_positions = moves

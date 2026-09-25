@@ -1,5 +1,4 @@
 from grid import Grid
-import matplotlib.pyplot as plt
 
 def menu_options():
     print("\'right arrow\': move forward by one timestep\n" \
