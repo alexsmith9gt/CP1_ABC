@@ -140,11 +140,13 @@ class Grid:
                             else:
                                 conflict_resolution_positions[tuple(pos)] = [d]
 
-            # Iterate over proposed movement locations and select the robot
-            # with greatest distance to the goal
+            
             moves_this_iter = 1
             while moves_this_iter:
                 moves_this_iter = 0
+
+                # Iterate over proposed movement locations and select the robot
+                # with greatest distance to the goal
                 for pos, data in conflict_resolution_positions.items():
                     max_dist = 0
                     max_dist_robot = -1
@@ -203,64 +205,44 @@ class Grid:
                                         collision = True
                                         break
 
+                            # Swap the robot locations if no collisions
                             if not collision:
                                 robot1.move_to(pos2)
                                 robots_to_move.remove(id1)
                                 robot2.move_to(pos1)
                                 robots_to_move.remove(id2)
-                                total_moves += 2
-                # Check if robots are stuck in a box
-                # This only happens very very rarely
+                                moves_this_iter += 2
+                total_moves += moves_this_iter
+                
+            if total_moves == 0:
+                # This only occurs in the very very special edge case where we have a loop of robots which all want to move together in a loop 
+                # This is solved naively by moving all of the robots. 
+                # Warning: This will cause collisions in the very very extremely rare case when there is a robot outside the loop that wants to move into the loop
+                if len(robots_to_move) == 4:
+                    for id in robots_to_move:
+                        self.robots[id].move_to(desired_moves_per_robot[id][0])
+                    robots_to_move.clear()
+                robots_in_loop = []
                 for id1 in robots_to_move:
                     robot1 = self.robots[id1]
                     pos1 = robot1.positions[-1]
+                    num_neighbors = 0
                     for id2 in robots_to_move:
-                        if id1 == id2:
-                            continue
                         robot2 = self.robots[id2]
                         pos2 = robot2.positions[-1]
-                        if np.any(np.all(pos1 == desired_moves_per_robot[id2], axis=1)) and \
-                            np.any(np.all(pos2 == desired_moves_per_robot[id1], axis=1)):
+                        if np.sum(np.abs(pos1 - pos2)) == 1:
+                            num_neighbors += 1
 
-                            # Collision checking
-                            collision = False
-                            for id3 in range(self.num_robots):
-                                robot3 = self.robots[id3]
-                                if id1 != id3 and id3 != id2 and \
-                                    np.all(pos2 == robot3.positions[-1]) and \
-                                    not robot3.at_goal(-1) and \
-                                    not robot1.can_coexist(robot3):
-                                        collision = True
-                                        break
-                                if id2 != id3 and id3 != id1 and \
-                                    np.all(pos1 == robot3.positions[-1]) and \
-                                    not robot3.at_goal(-1) and \
-                                    not robot2.can_coexist(robot3):
-                                        collision = True
-                                        break
+                    if num_neighbors > 1:
+                        robots_in_loop += [id1]
 
-                            if not collision:
-                                robot1.move_to(pos2)
-                                robots_to_move.remove(id1)
-                                robot2.move_to(pos1)
-                                robots_to_move.remove(id2)
-                                total_moves += 2
-                total_moves += moves_this_iter
-            if total_moves == 0:
-                # This only occurs in the very very special edge case where we have 4 robots which cannot overlap in a square formation
-                # all want to move into each other. We must find the 4 robots in a box (in case there is a stray )
-                for id in robots_to_move:
+                for id in robots_in_loop:
                     self.robots[id].move_to(desired_moves_per_robot[id][0])
                     robots_to_move.remove(id)
 
             # If we were unable to move a robot, make it stay still and wait
             for id in robots_to_move:
                 self.robots[id].move_to(self.robots[id].positions[-1])
-
-            # if total_moves == 0:
-            #     print("Simulation is stuck!")
-            #     self.visualize()
-                # assert False
 
             self.collision_check()
 
@@ -287,5 +269,3 @@ class Grid:
                 not (robot1.at_goal(-1) or robot2.at_goal(-1)) and \
                 not robot1.can_coexist(robot2):
                     print(f"Collision case found at {robot1.positions[-1]}!")
-                    self.visualize()
-                    # assert False
